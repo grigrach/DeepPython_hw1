@@ -1,6 +1,5 @@
 import csv
 import re
-from collections import defaultdict
 
 # Функция для стандартизации номеров телефонов
 def clean_phone_number(phone):
@@ -16,8 +15,8 @@ def process_phonebook(input_path, output_path):
         rows = csv.reader(f, delimiter=",")
         contacts_list = list(rows)
 
-    # Используем словарь для объединения дубликатов
-    contacts_dict = defaultdict(lambda: ["", "", "", "", "", "", ""])
+    # Используем обычный словарь вместо defaultdict
+    contacts_dict = {}
 
     # Обрабатываем записи
     for contact in contacts_list:
@@ -32,17 +31,23 @@ def process_phonebook(input_path, output_path):
 
         # Ключ - Фамилия и Имя
         key = (lastname, firstname)
+
+        # Если ключа нет в словаре, создаём новую запись
+        if key not in contacts_dict:
+            contacts_dict[key] = ["", "", "", "", "", "", ""]
+
+        # Получаем существующую запись
         existing_entry = contacts_dict[key]
 
         # Объединяем данные
         contacts_dict[key] = [
-            lastname or existing_entry[0],
-            firstname or existing_entry[1],
-            surname or existing_entry[2],
-            contact[3] or existing_entry[3],
-            contact[4] or existing_entry[4],
-            phone or existing_entry[5],
-            contact[6] or existing_entry[6],
+            lastname or existing_entry[0],  # Фамилия
+            firstname or existing_entry[1],  # Имя
+            surname or existing_entry[2],  # Отчество
+            contact[3] or existing_entry[3],  # Организация
+            contact[4] or existing_entry[4],  # Должность
+            phone or existing_entry[5],  # Телефон
+            contact[6] or existing_entry[6],  # Email
         ]
 
     # Преобразуем словарь обратно в список
